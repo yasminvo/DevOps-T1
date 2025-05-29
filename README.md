@@ -21,18 +21,17 @@ RA: 812308
 
 ## Funcionalidades da API
 
-- Criar tutoriais
-- Listar todos os tutoriais
-- Buscar por título
-- Atualizar tutoriais
-- Deletar tutoriais
-- Marcar tutoriais como publicado ou não publicado
+- Criar usuários
+- Listar todos os usuários
+- Buscar usuário por nome ou outros critérios
+- Atualizar usuários
+- Deletar usuários
 
 ---
 
 ## Arquitetura dos Containers
 
-O projeto roda utilizando **4 containers**, cada um com uma responsabilidade específica:
+O projeto roda utilizando **3 containers**, cada um com uma responsabilidade específica:
 
 | Container        | Descrição                                                              | Porta Local |
 |------------------|------------------------------------------------------------------------|-------------|
