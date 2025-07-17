@@ -11,7 +11,7 @@ app.use(express.json());
 
 app.use(express.urlencoded({ extended: true }));
 
-const db = require("./app/models");
+const db = require("./models");
 db.mongoose
   .connect(db.url, {
     useNewUrlParser: true,
@@ -30,7 +30,7 @@ app.get("/", (req, res) => {
   res.json({ message: "Welcome to yasminvo application." });
 });
 
-require("./app/routes/user.routes")(app);
+require("./routes/user.routes")(app);
 
 // set port, listen for requests
 const PORT = process.env.PORT || 8080;
