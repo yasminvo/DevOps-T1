@@ -18,13 +18,13 @@ build_backend_image() {
     # Gerando a imagem docker do backend
     ################################################
     
-    cd ./app
+    cd backend
     
-    eval ${minikube docker-env}
+    # eval ${minikube docker-env}
 
-    docker build . -t yasminvo1/backend-2
+    docker build . -t yasminvo1/backend
 
-    load_image yasminvo1/backend-2
+    load_image yasminvo1/backend
 
     cd ..
 }
@@ -35,9 +35,9 @@ build_frontend_image() {
     # Gerando a imagem docker do frontend
     ################################################
     
-    cd ./client
+    cd frontend
     
-    eval ${minikube docker-env}
+    # eval ${minikube docker-env}
     
     docker build . -t yasminvo1/frontend
     
@@ -46,8 +46,8 @@ build_frontend_image() {
     cd ..
 }
 
-load_mysql_image() {
-    minikube image load 
+load_mongo_image() {
+    load_image mongo
 }
 
 init_minikube() {
@@ -61,6 +61,8 @@ init_minikube() {
     ################################################
     # Habilitando o Ingress
     ################################################
+
+    minikube image load k8s.gcr.io/ingress-nginx/controller:v1.9.4
 
     minikube addons enable ingress
 
@@ -76,60 +78,24 @@ init_minikube() {
 }
 
 ################################################
-# Verificando flags -ib
+# Verificando flag -b
 ################################################
 
 while getopts ":ib" option; do
    case $option in
-      i) # initialize/start minikube
+      i) # init minikube
          init_minikube
-         ;;  
+         ;;
       b) # build images
          build_backend_image
          build_frontend_image
-         load_image mongo
+         load_mongo_image
          ;;
    esac
 done
 
 ################################################
-# Configurando o K8s (DB)
+# Instalando via helm
 ################################################
 
-cd K8s/db
-
-kubectl create -f pv.yaml; kubectl create -f pvc.yaml;
-
-kubectl apply -f deployment.yaml; kubectl apply -f service.yaml;
-
-cd ../..
-
-################################################
-# Configurando o backend
-################################################
-
-cd K8s/backend
-
-kubectl wait --for=jsonpath='{.status.phase}'=Running $(kubectl get pods -o=name) --timeout=300s
-
-kubectl apply -f deployment.yaml; kubectl apply -f service.yaml; 
-
-cd ../..
-
-################################################
-# Configurando o frontend
-################################################
-
-cd K8s/frontend
-
-kubectl apply -f deployment.yaml; kubectl apply -f service.yaml;  
-
-cd ../..
-
-################################################
-# Configurando o Ingress
-################################################
-
-cd K8s
-
-kubectl apply -f ingress.yaml
+helm install users-chart ./users-chart

@@ -1,0 +1,6 @@
+replicaCount: 1
+
+image:
+  repository: yasminvo1/frontend
+  tag: "latest"
+  pullPolicy: IfNotPresent

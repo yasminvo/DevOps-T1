@@ -23,6 +23,7 @@ exports.create = async (req, res) => {
 };
 
 exports.findAll = async (req, res) => {
+  console.log("AAAAAAAAAAAAAAAAA")
   try {
     const data = await User.find();
     res.send(data);
