@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: backend
-          image: yasminvo1/backend:1.0
+          image: yasminvo1/backend:latest
           imagePullPolicy: IfNotPresent
           env:
             - name: PORT
