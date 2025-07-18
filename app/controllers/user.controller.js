@@ -23,7 +23,6 @@ exports.create = async (req, res) => {
 };
 
 exports.findAll = async (req, res) => {
-  console.log("AAAAAAAAAAAAAAAAA")
   try {
     const data = await User.find();
     res.send(data);
@@ -52,27 +51,34 @@ exports.findOne = async (req, res) => {
 };
 
 exports.update = async (req, res) => {
-  if (!req.body) {
+  const id = req.params.id;
+
+  if (!req.body || Object.keys(req.body).length === 0) {
     return res.status(400).send({
       message: "Data to update cannot be empty!"
     });
   }
 
-  const id = req.params.id;
-
   try {
-    const data = await User.findByIdAndUpdate(id, req.body, {
-      useFindAndModify: false,
+    // Se a senha estiver vazia (''), remover para não sobrescrever
+    if ('password' in req.body && !req.body.password) {
+      delete req.body.password;
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(id, req.body, {
       new: true
     });
 
-    if (!data) {
-      res.status(404).send({
-        message: `Cannot update User with id=${id}. Maybe User was not found!`
+    if (!updatedUser) {
+      return res.status(404).send({
+        message: `User with id=${id} not found.`
       });
-    } else {
-      res.send({ message: "User was updated successfully." });
     }
+
+    res.send({
+      message: "User updated successfully.",
+      user: updatedUser
+    });
   } catch (err) {
     res.status(500).send({
       message: "Error updating User with id=" + id
@@ -80,26 +86,26 @@ exports.update = async (req, res) => {
   }
 };
 
+
 exports.delete = async (req, res) => {
   const id = req.params.id;
 
   try {
-    const data = await User.findByIdAndRemove(id, { useFindAndModify: false });
+    const data = await User.findByIdAndRemove(id);
     if (!data) {
-      res.status(404).send({
+      return res.status(404).send({
         message: `Cannot delete User with id=${id}. Maybe User was not found!`
       });
-    } else {
-      res.send({
-        message: "User was deleted successfully!"
-      });
     }
+
+    res.send({ message: "User deleted successfully!" });
   } catch (err) {
     res.status(500).send({
       message: "Could not delete User with id=" + id
     });
   }
 };
+
 
 exports.deleteAll = async (req, res) => {
   try {

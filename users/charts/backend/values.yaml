@@ -1,6 +1,5 @@
 replicaCount: 1
 
 image:
-  repository: yasminvo1/backend
-  tag: "latest"
+  repository: yasminvo1/backend-2
   pullPolicy: IfNotPresent

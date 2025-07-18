@@ -28,12 +28,16 @@ function App() {
 
   const handleSubmit = e => {
     e.preventDefault();
-    const payload = { 
+  
+    const payload = {
       name: form.name,
       email: form.email,
-      password: form.password,
     };
-    
+  
+    if (!editId || (editId && form.password.trim() !== '')) {
+      payload.password = form.password;
+    }
+  
     if (editId) {
       axios.put(`${API_URL}/${editId}`, payload)
         .then(() => {
@@ -50,6 +54,7 @@ function App() {
         .catch(err => console.error(err));
     }
   };
+  
 
   const resetForm = () => {
     setForm({ name: '', email: '', password: '' });

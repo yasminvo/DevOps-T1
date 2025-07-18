@@ -4,4 +4,4 @@
 # Desinstalando via Helm
 ################################################
 
-helm uninstall users-chart
+helm uninstall users

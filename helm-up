@@ -1,15 +1,9 @@
 #!/bin/bash
 
 load_image() {
-
-    # minikube image load apenas funciona no docker 24
     
     minikube image load $1
 
-    # Acredito que funciona para qualquer versão do docker
-    # docker image save -o image.tar $1
-    # minikube image load image.tar
-    # rm image.tar
 }
 
 build_backend_image() {
@@ -18,13 +12,13 @@ build_backend_image() {
     # Gerando a imagem docker do backend
     ################################################
     
-    cd backend
+    cd ./app
     
-    # eval ${minikube docker-env}
+    eval $(minikube docker-env)
 
-    docker build . -t yasminvo1/backend
+    docker build . -t yasminvo1/backend-2
 
-    load_image yasminvo1/backend
+    load_image yasminvo1/backend-2
 
     cd ..
 }
@@ -35,9 +29,9 @@ build_frontend_image() {
     # Gerando a imagem docker do frontend
     ################################################
     
-    cd frontend
+    cd ./client
     
-    # eval ${minikube docker-env}
+    eval $(minikube docker-env)
     
     docker build . -t yasminvo1/frontend
     
@@ -90,12 +84,13 @@ while getopts ":ib" option; do
          build_backend_image
          build_frontend_image
          load_mongo_image
+
+        ################################################
+        # Instalando via helm
+        ################################################
+
+        helm install users ./users
          ;;
    esac
 done
 
-################################################
-# Instalando via helm
-################################################
-
-helm install users-chart ./users-chart

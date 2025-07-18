@@ -1,135 +1,76 @@
 #!/bin/bash
 
 load_image() {
-
-    # minikube image load apenas funciona no docker 24
-    
     minikube image load $1
-
-    # Acredito que funciona para qualquer versão do docker
-    # docker image save -o image.tar $1
-    # minikube image load image.tar
-    # rm image.tar
 }
 
 build_backend_image() {
-    
-    ################################################
-    # Gerando a imagem docker do backend
-    ################################################
-    
+    echo "🛠️  Buildando imagem do backend..."
     cd ./app
-    
-    eval ${minikube docker-env}
-
     docker build . -t yasminvo1/backend-2
-
     load_image yasminvo1/backend-2
-
     cd ..
 }
 
 build_frontend_image() {
-    
-    ################################################
-    # Gerando a imagem docker do frontend
-    ################################################
-    
+    echo "🛠️  Buildando imagem do frontend..."
     cd ./client
-    
-    eval ${minikube docker-env}
-    
     docker build . -t yasminvo1/frontend
-    
     load_image yasminvo1/frontend
-
     cd ..
 }
 
-load_mysql_image() {
-    minikube image load 
-}
-
 init_minikube() {
-
-    ################################################
-    # Inicializando o Minikube
-    ################################################
-
+    echo "🚀 Iniciando o Minikube..."
     minikube start
 
-    ################################################
-    # Habilitando o Ingress
-    ################################################
-
+    echo "✅ Ativando addons..."
     minikube addons enable ingress
-
-    ################################################
-    # Inicializando o DashBoard
-    ################################################
-
     minikube addons enable dashboard
-
     minikube addons enable metrics-server
 
     minikube dashboard &
 }
 
-################################################
-# Verificando flags -ib
-################################################
-
+# FLAGS
 while getopts ":ib" option; do
    case $option in
-      i) # initialize/start minikube
-         init_minikube
-         ;;  
-      b) # build images
-         build_backend_image
-         build_frontend_image
-         load_image mongo
-         ;;
-   esac
+      i)
+        init_minikube
+        ;;
+      b)
+        build_backend_image
+        build_frontend_image
+        load_image mongo
+        
+        echo "📦 Aplicando configuração do banco de dados..."
+        cd K8s/db
+        kubectl apply -f pv.yaml
+        kubectl apply -f pvc.yaml
+        kubectl apply -f deployment.yaml
+        kubectl apply -f service.yaml
+        cd ../..
+
+        echo "📦 Aplicando configuração do backend..."
+        cd K8s/backend
+        kubectl apply -f deployment.yaml
+        kubectl apply -f service.yaml
+        cd ../..
+
+        echo "📦 Aplicando configuração do frontend..."
+        cd K8s/frontend
+        kubectl apply -f deployment.yaml
+        kubectl apply -f service.yaml
+        cd ../..
+
+        echo "🌐 Aplicando ingress..."
+        cd K8s
+        kubectl apply -f ingress.yaml
+        cd ..
+
+        ;;
+
+    esac
+
 done
 
-################################################
-# Configurando o K8s (DB)
-################################################
-
-cd K8s/db
-
-kubectl create -f pv.yaml; kubectl create -f pvc.yaml;
-
-kubectl apply -f deployment.yaml; kubectl apply -f service.yaml;
-
-cd ../..
-
-################################################
-# Configurando o backend
-################################################
-
-cd K8s/backend
-
-kubectl wait --for=jsonpath='{.status.phase}'=Running $(kubectl get pods -o=name) --timeout=300s
-
-kubectl apply -f deployment.yaml; kubectl apply -f service.yaml; 
-
-cd ../..
-
-################################################
-# Configurando o frontend
-################################################
-
-cd K8s/frontend
-
-kubectl apply -f deployment.yaml; kubectl apply -f service.yaml;  
-
-cd ../..
-
-################################################
-# Configurando o Ingress
-################################################
-
-cd K8s
-
-kubectl apply -f ingress.yaml

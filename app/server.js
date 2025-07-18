@@ -25,10 +25,10 @@ db.mongoose
     process.exit();
   });
 
-// simple route
-// app.get("/", (req, res) => {
-//   res.json({ message: "Welcome to yasminvo application." });
-// });
+
+app.get("/", (req, res) => {
+  res.json({ message: "Welcome to yasminvo application." });
+});
 
 require("./routes/user.routes")(app);
 
