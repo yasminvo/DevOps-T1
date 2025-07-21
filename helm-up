@@ -1,0 +1,96 @@
+#!/bin/bash
+
+load_image() {
+    
+    minikube image load $1
+
+}
+
+build_backend_image() {
+    
+    ################################################
+    # Gerando a imagem docker do backend
+    ################################################
+    
+    cd ./app
+    
+    eval $(minikube docker-env)
+
+    docker build . -t backend-t2
+
+    # load_image backend-t2
+
+    cd ..
+}
+
+build_frontend_image() {
+    
+    ################################################
+    # Gerando a imagem docker do frontend
+    ################################################
+    
+    cd ./client
+    
+    eval $(minikube docker-env)
+    
+    docker build . -t frontend-t2
+    
+    # load_image frontend-t2
+
+    cd ..
+}
+
+load_mongo_image() {
+    load_image mongo
+}
+
+init_minikube() {
+
+    ################################################
+    # Inicializando o Minikube
+    ################################################
+
+    minikube start
+
+    ################################################
+    # Habilitando o Ingress
+    ################################################
+
+    minikube image load k8s.gcr.io/ingress-nginx/controller:v1.9.4
+
+    minikube addons enable ingress
+
+    ################################################
+    # Inicializando o DashBoard
+    ################################################
+
+    minikube addons enable dashboard
+
+    minikube addons enable metrics-server
+
+    minikube dashboard &
+}
+
+################################################
+# Verificando flag -b
+################################################
+
+while getopts ":ib" option; do
+   case $option in
+      i) # init minikube
+         init_minikube
+         ;;
+      b) # build images
+         build_backend_image
+         build_frontend_image
+         load_mongo_image
+
+        ################################################
+        # Instalando via helm
+        ################################################
+
+        helm install users ./users
+         ;;
+   esac
+done
+
