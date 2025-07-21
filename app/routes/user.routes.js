@@ -5,9 +5,6 @@ module.exports = app => {
   router.post("/", users.create);
   router.get("/", users.findAll);
   router.get("/:id", users.findOne);
-  router.put("/:id", users.update);
-  router.delete("/:id", users.delete);
-  router.delete("/", users.deleteAll);
 
   app.use("/users", router);  // prefixo '/users'
 };

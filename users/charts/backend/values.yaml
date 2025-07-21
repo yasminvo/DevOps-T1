@@ -1,5 +1,5 @@
 replicaCount: 1
 
 image:
-  repository: yasminvo1/backend-2
-  pullPolicy: IfNotPresent
+  repository: backend-t2
+  pullPolicy: Never

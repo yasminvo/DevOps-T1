@@ -16,9 +16,9 @@ build_backend_image() {
     
     eval $(minikube docker-env)
 
-    docker build . -t yasminvo1/backend-2
+    docker build . -t backend-t2
 
-    load_image yasminvo1/backend-2
+    # load_image backend-t2
 
     cd ..
 }
@@ -33,9 +33,9 @@ build_frontend_image() {
     
     eval $(minikube docker-env)
     
-    docker build . -t yasminvo1/frontend
+    docker build . -t frontend-t2
     
-    load_image yasminvo1/frontend
+    # load_image frontend-t2
 
     cd ..
 }
